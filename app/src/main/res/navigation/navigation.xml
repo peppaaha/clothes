@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/navigation"
+    app:startDestination="@id/action_clothes">
+    <fragment
+        android:id="@+id/action_clothes"
+        android:name="com.example.clothes.stFragment"
+        android:label="clothes"
+        tools:layout="@layout/st_fragment" />
+    <fragment
+        android:id="@+id/action_home"
+        android:name="com.example.clothes.ndFragment"
+        android:label="home"
+        tools:layout="@layout/nd_fragment" />
+</navigation>
