@@ -16,7 +16,7 @@
 
     android:layout_height="match_parent"
 
-    tools:context=".MainActivity">
+    tools:context=".stFragment">
 
 
     <ImageView
@@ -138,7 +138,7 @@
         android:layout_marginLeft="250dp"
 
         app:srcCompat="@drawable/logo" />
-
+<!--
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/bottomNavigationView"
         android:layout_width="match_parent"
@@ -150,7 +150,7 @@
         app:menu="@menu/menu">
 
 
-    </com.google.android.material.bottomnavigation.BottomNavigationView>
+    </com.google.android.material.bottomnavigation.BottomNavigationView> -->
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -279,7 +279,8 @@
 
             android:textColor="@color/colorPrimaryDark"
 
-            android:textSize="25sp"
+            android:textSize="25sp" />
+            <!--
 
             app:layout_constraintBottom_toBottomOf="parent"
 
@@ -291,7 +292,7 @@
 
             app:layout_constraintTop_toTopOf="parent"
 
-            app:layout_constraintVertical_bias="0.058" />
+            app:layout_constraintVertical_bias="0.058" -->
 
         <LinearLayout
             android:layout_width="match_parent"
