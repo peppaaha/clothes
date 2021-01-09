@@ -4,11 +4,11 @@
     <item
         android:id="@+id/action_clothes"
         android:icon="@drawable/ic_nature_people_black_24dp"
-        android:title="clothes"
+        android:title="Clothes"
        />
     <item
         android:id="@+id/action_home"
         android:icon="@drawable/ic_home_black_24dp"
-        android:title="home"
+        android:title="Home"
         />
 </menu>

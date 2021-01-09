@@ -7,11 +7,11 @@
     <fragment
         android:id="@+id/action_clothes"
         android:name="com.example.clothes.stFragment"
-        android:label="clothes"
+        android:label="Clothes"
         tools:layout="@layout/st_fragment" />
     <fragment
         android:id="@+id/action_home"
         android:name="com.example.clothes.ndFragment"
-        android:label="home"
+        android:label="Home"
         tools:layout="@layout/nd_fragment" />
 </navigation>

@@ -1,3 +1,19 @@
 <resources>
     <string name="app_name">clothes</string>
+    <!-- Settings Activity Title -->
+    <string name="title_activity_settings">nothing</string>
+
+    <!-- Preference Titles -->
+    <string name="messages_header">nothing</string>
+    <string name="sync_header">nothing</string>
+
+    <!-- Messages Preferences -->
+    <string name="signature_title">nothing</string>
+    <string name="reply_title">nothing</string>
+
+    <!-- Sync Preferences -->
+    <string name="sync_title">nothing</string>
+    <string name="attachment_title">nothing</string>
+    <string name="attachment_summary_on">nothing</string>
+    <string name="attachment_summary_off">nothing</string>
 </resources>
