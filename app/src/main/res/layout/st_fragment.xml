@@ -54,7 +54,7 @@
 
             android:layout_height="wrap_content"
             android:layout_marginTop="120dp"
-            android:text="晴"
+            android:text="晴朗"
 
             android:textColor="@color/colorAccent"
 
