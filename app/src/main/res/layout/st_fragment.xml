@@ -117,7 +117,7 @@
 
         android:layout_height="wrap_content"
         android:layout_marginTop="100dp"
-        android:text="2021-1-5"
+        android:text="2021-1-14"
         android:layout_marginStart="30dp"
         android:textColor="@color/colorAccent"
 
