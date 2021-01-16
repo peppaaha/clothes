@@ -5,21 +5,97 @@ import android.Manifest.permission.ACCESS_COARSE_LOCATION
 import android.app.Activity
 import android.app.Application
 import android.content.Context.LOCATION_SERVICE
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.location.Location
 import android.location.LocationListener
 import android.location.LocationManager
 import android.os.Build
 import android.util.Log
+import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.core.app.ActivityCompat
 import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
+import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
+import okhttp3.Call
+import okhttp3.OkHttpClient
+import okhttp3.Request
+import okhttp3.Response
+import java.io.IOException
+import java.lang.Exception
 import java.util.concurrent.Executor
 import java.util.function.Consumer
+import java.util.regex.Pattern
+import kotlin.concurrent.thread
 import kotlin.arrayOf as arrayOf1
 
 
-class StViewModel(application: Application) : AndroidViewModel(application) {
+data class Weather(val data : Data, val status : Int, val desc : String)
+data class Data(val yesterday : Yesterday, val city : String, val forecast : List<FutureWeather>, val ganmao : String, val wendu : String)
+data class Yesterday(val date : String, val high : String, val fx : String, val low : String, val fl : String, val type : String)
+data class FutureWeather(val date : String, val high : String, val fengli : String, val low : String, val fengxiang : String, val type : String)
+
+class StViewModel() : ViewModel() {
+    object HttpUtil {
+        fun sendOkHttpRequest(address: String, callback : okhttp3.Callback) {
+            val client = OkHttpClient()
+            val request = Request.Builder()
+                .url(address)
+                .build()
+            client.newCall(request).enqueue(callback)
+        }
+    }
+
+    fun getWeatherFromOkHttp(httpUrl : String) {
+        HttpUtil.sendOkHttpRequest(httpUrl, object : okhttp3.Callback {
+            override fun onResponse(call: Call, response: Response) {
+                thread {
+                    try {
+                        val responseData = response.body?.string()
+                        if(responseData != null) {
+                            parseJSONWithGSON(responseData)
+                        }
+                    } catch(e : Exception) {
+                        e.printStackTrace()
+                    }
+                }
+            }
+            override fun onFailure(call: Call, e: IOException) {
+                e.printStackTrace()
+            }
+        })
+    }
+
+    val weatherReturnToFragment = MutableLiveData<Intent>()
+
+    fun stringToPureNumber(oldString : String) : String {
+        val newString = StringBuffer()
+        val matcher = Pattern.compile("-?\\d").matcher(oldString)
+        while (matcher.find()) {
+            newString.append(matcher.group())
+        }
+        return newString.toString()
+    }
+
+    private fun parseJSONWithGSON(jsonData: String) {
+        val gson = Gson()
+        val weather = gson.fromJson(jsonData, Weather::class.java)
+        weatherReturnToFragment.postValue(Intent().apply {
+
+
+            putExtra("high", stringToPureNumber(weather.data.forecast[0].high)+"°")
+            putExtra("low", stringToPureNumber(weather.data.forecast[0].low)+"°")
+            putExtra("type", weather.data.forecast[0].type)
+        })
+
+        Log.d("Weather", "high is ${weather.data.forecast[0].high}")
+        Log.d("Weather", "fengli is ${weather.data.forecast[0].fengli}")
+        Log.d("Weather", "low is ${weather.data.forecast[0].low}")
+        Log.d("Weather", "type is ${weather.data.forecast[0].type}")
+    }
     /*
     @RequiresApi(Build.VERSION_CODES.N)
     internal object LocationConsumer : Consumer<Location> {
