@@ -1,12 +1,16 @@
 <resources>
     <!-- Reply Preference -->
-    <string-array name="reply_entries">
-        <item>A</item>
-        <item>B</item>
+    <string-array name="city_list">
+        <item>北京</item>
+        <item>上海</item>
+        <item>广州</item>
+        <item>深圳</item>
     </string-array>
 
-    <string-array name="reply_values">
-        <item>a</item>
-        <item>b</item>
+    <string-array name="city_values">
+        <item>beijing</item>
+        <item>shanghai</item>
+        <item>guangzhou</item>
+        <item>shenzhen</item>
     </string-array>
 </resources>

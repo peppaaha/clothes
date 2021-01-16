@@ -8,11 +8,11 @@
             app:useSimpleSummaryProvider="true" />
 
         <ListPreference
-            app:defaultValue="reply"
-            app:entries="@array/reply_entries"
-            app:entryValues="@array/reply_values"
-            app:key="reply"
-            app:title="@string/reply_title"
+            app:defaultValue="city"
+            app:entries="@array/city_list"
+            app:entryValues="@array/city_values"
+            app:key="city"
+            app:title="@string/city_title"
             app:useSimpleSummaryProvider="true" />
 
     </PreferenceCategory>

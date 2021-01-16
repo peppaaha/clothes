@@ -17,6 +17,8 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.example.clothes.stSonActivity.stSonClothesDetailActivity
+import java.util.*
+import kotlin.collections.ArrayList
 
 
 class stFragment : Fragment() {
@@ -34,13 +36,28 @@ class stFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         val newView : View = inflater.inflate(R.layout.st_fragment, container, false)
+        viewModel = ViewModelProviders.of(this).get(StViewModel::class.java)
+        initClothesListRecyclerView(newView)
+        initCalendar(newView)
+        return newView
+    }
+
+    private fun initCalendar(newView : View) {
+        val calendar = Calendar.getInstance()
+        val year = calendar.get(Calendar.YEAR)
+        val month = calendar.get(Calendar.MONTH) + 1  // The first month is 0
+        val date = calendar.get(Calendar.DATE)
+        val dateTextView : TextView = newView.findViewById(R.id.date)
+        dateTextView.text = "$year-$month-$date"
+    }
+
+    private fun initClothesListRecyclerView(newView : View) {
         initClothes()
         val layoutManager = StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL)
         val stFragmentrecyclerView : RecyclerView = newView.findViewById(R.id.stFragmentRecyclerView)
         stFragmentrecyclerView.layoutManager = layoutManager
         val adapter = stFragmentAdapter(clothesList)
         stFragmentrecyclerView.adapter = adapter
-        return newView
     }
 
     private fun initClothes() {
@@ -72,8 +89,8 @@ class stFragmentAdapter(val clothesList: List<stFragmentClothes>) :
             .inflate(R.layout.st_fragment_clothes, parent, false)
         val viewHolder = ViewHolder(view)
         viewHolder.itemView.setOnClickListener {
-            val position = viewHolder.adapterPosition
-            val clothes = clothesList[position]
+          //  val position = viewHolder.adapterPosition
+         //   val clothes = clothesList[position]
             val intent = Intent(parent.context, stSonClothesDetailActivity::class.java)
             startActivity(parent.context, intent, null)
         }

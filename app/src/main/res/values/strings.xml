@@ -9,7 +9,7 @@
 
     <!-- Messages Preferences -->
     <string name="signature_title">nothing</string>
-    <string name="reply_title">nothing</string>
+    <string name="city_title">城市</string>
 
     <!-- Sync Preferences -->
     <string name="sync_title">nothing</string>
