@@ -10,6 +10,7 @@ import androidx.navigation.ui.setupWithNavController
 import com.example.clothes.ndSonActivity.ndSonSettingsActivity
 import com.google.android.material.bottomnavigation.BottomNavigationView
 
+
 class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -32,5 +33,7 @@ class MainActivity : AppCompatActivity() {
         val actionBar = supportActionBar
         actionBar?.hide()
     }
+
+
 }
 
