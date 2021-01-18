@@ -30,6 +30,7 @@ import kotlin.concurrent.thread
 
 class stFragment : Fragment() {
 
+
     companion object {
         fun newInstance() = stFragment()
     }
