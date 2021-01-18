@@ -3,6 +3,7 @@ package com.example.clothes;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -44,6 +45,7 @@ public class SearchCityActivity extends BaseAcitivity implements View.OnClickLis
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 city = hotCitys[position];
+                Log.d("SearchCityActivity", "get city");
                 String url = url1+city+url2;
                 loadData(url);
             }
@@ -74,13 +76,16 @@ public class SearchCityActivity extends BaseAcitivity implements View.OnClickLis
     @Override
     public void onSuccess(String result) {
 
+        Log.d("SearchCityActivity", "onSuccess");
         WeatherBean weatherBean = new WeatherBean();
         if (weatherBean.getError() == 0) {
             //跳转到某页面
             Intent intent = new Intent(this, MainActivity.class);
             intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK|Intent.FLAG_ACTIVITY_NEW_TASK);
             intent.putExtra("city",city);
-            startActivity(intent);
+            setResult(RESULT_OK, intent);
+            Log.d("SearchCityActivity", "Ready to finish");
+            finish();
         } else{
             Toast.makeText(this,"暂时未收入此城市天气信息...",Toast.LENGTH_SHORT).show();
         }

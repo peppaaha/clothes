@@ -20,27 +20,25 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
-import okhttp3.Call
-import okhttp3.OkHttpClient
-import okhttp3.Request
-import okhttp3.Response
+import okhttp3.*
 import java.io.IOException
 import java.lang.Exception
 import java.util.concurrent.Executor
 import java.util.function.Consumer
 import java.util.regex.Pattern
 import kotlin.concurrent.thread
-import kotlin.arrayOf as arrayOf1
 
 
-data class Weather(val data : Data, val status : Int, val desc : String)
-data class Data(val yesterday : Yesterday, val city : String, val forecast : List<FutureWeather>, val ganmao : String, val wendu : String)
-data class Yesterday(val date : String, val high : String, val fx : String, val low : String, val fl : String, val type : String)
-data class FutureWeather(val date : String, val high : String, val fengli : String, val low : String, val fengxiang : String, val type : String)
+data class Weather(val data : Data, val status : Int, val desc : String) {
+    data class Data(val yesterday : Yesterday, val city : String, val forecast : List<FutureWeather>, val ganmao : String, val wendu : String)
+    data class Yesterday(val date : String, val high : String, val fx : String, val low : String, val fl : String, val type : String)
+    data class FutureWeather(val date : String, val high : String, val fengli : String, val low : String, val fengxiang : String, val type : String)
+}
+
 
 class StViewModel() : ViewModel() {
     object HttpUtil {
-        fun sendOkHttpRequest(address: String, callback : okhttp3.Callback) {
+        fun sendOkHttpRequest(address: String, callback : Callback) {
             val client = OkHttpClient()
             val request = Request.Builder()
                 .url(address)
@@ -50,7 +48,7 @@ class StViewModel() : ViewModel() {
     }
 
     fun getWeatherFromOkHttp(httpUrl : String) {
-        HttpUtil.sendOkHttpRequest(httpUrl, object : okhttp3.Callback {
+        HttpUtil.sendOkHttpRequest(httpUrl, object : Callback {
             override fun onResponse(call: Call, response: Response) {
                 thread {
                     try {
@@ -73,6 +71,7 @@ class StViewModel() : ViewModel() {
 
     fun stringToPureNumber(oldString : String) : String {
         val newString = StringBuffer()
+        //使用正则表达式， 让字符中只留下 负号 和 数字
         val matcher = Pattern.compile("-?\\d").matcher(oldString)
         while (matcher.find()) {
             newString.append(matcher.group())
@@ -83,6 +82,8 @@ class StViewModel() : ViewModel() {
     private fun parseJSONWithGSON(jsonData: String) {
         val gson = Gson()
         val weather = gson.fromJson(jsonData, Weather::class.java)
+        // 使用LiveData让view对viewModel中值的改变进行监听
+        // 通过Intent传递信息
         weatherReturnToFragment.postValue(Intent().apply {
 
 
