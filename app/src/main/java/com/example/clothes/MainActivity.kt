@@ -2,6 +2,8 @@ package com.example.clothes
 
 import android.content.Intent
 import android.os.Bundle
+import android.os.Parcel
+import android.os.Parcelable
 import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
@@ -10,7 +12,10 @@ import androidx.navigation.ui.setupWithNavController
 import com.example.clothes.ndSonActivity.ndSonSettingsActivity
 import com.google.android.material.bottomnavigation.BottomNavigationView
 
-class MainActivity : AppCompatActivity() {
+class MainActivity() : AppCompatActivity(), Parcelable {
+
+    constructor(parcel: Parcel) : this() {
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -31,6 +36,24 @@ class MainActivity : AppCompatActivity() {
     private fun hideActionBar() {
         val actionBar = supportActionBar
         actionBar?.hide()
+    }
+
+    override fun writeToParcel(parcel: Parcel, flags: Int) {
+
+    }
+
+    override fun describeContents(): Int {
+        return 0
+    }
+
+    companion object CREATOR : Parcelable.Creator<MainActivity> {
+        override fun createFromParcel(parcel: Parcel): MainActivity {
+            return MainActivity(parcel)
+        }
+
+        override fun newArray(size: Int): Array<MainActivity?> {
+            return arrayOfNulls(size)
+        }
     }
 }
 
