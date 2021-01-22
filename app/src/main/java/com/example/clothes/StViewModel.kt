@@ -58,6 +58,8 @@ class StViewModel() : ViewModel() {
         // 使用LiveData让view对viewModel中值的改变进行监听
         // 通过Intent传递信息
         val intent = Intent().apply {
+            putExtra("temperatureNum", weather.result.realtime.temperature)
+            putExtra("humidityNum", weather.result.realtime.humidity)
             putExtra("temperature", Tools.convertDoubleToIntByRounding(weather.result.realtime.temperature)
                 .toString()
                     + "°")
@@ -66,6 +68,7 @@ class StViewModel() : ViewModel() {
             )
             putExtra("humidity", (weather.result.realtime.humidity * 100).toInt().toString()
                     + "%")
+            putExtra("windSpeed", weather.result.realtime.wind.speed)
         }
         weatherReturnToFragment.postValue(intent)
         Log.d("Weather", "temperature is ${weather.result.realtime.temperature}")
