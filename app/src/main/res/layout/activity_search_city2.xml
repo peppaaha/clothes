@@ -34,7 +34,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_below="@id/search_tv"
-        android:numColumns="5"></GridView>
+        android:numColumns="2"></GridView>
 
 
 </RelativeLayout>

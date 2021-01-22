@@ -54,7 +54,7 @@
 
             android:layout_height="wrap_content"
             android:layout_marginTop="120dp"
-            android:text="晴朗"
+            android:text="晴"
 
             android:textColor="@color/colorAccent"
 
@@ -69,7 +69,7 @@
         <TextView
 
             android:id="@+id/locate"
-
+            android:clickable="true"
             android:layout_width="wrap_content"
 
             android:layout_height="wrap_content"
@@ -79,7 +79,7 @@
             android:layout_marginTop="60dp"
 
             android:gravity="right"
-            android:text="北京"
+            android:text="北京市"
             android:textColor="@color/colorAccent"
             android:textSize="25sp" />
 
@@ -162,7 +162,7 @@
 
             android:layout_marginLeft="15dp"
 
-            android:layout_marginTop="250dp"
+            android:layout_marginTop="220dp"
 
             android:text="今日推荐"
 

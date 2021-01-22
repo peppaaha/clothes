@@ -2,12 +2,14 @@ package com.example.clothes
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
+import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
+import androidx.fragment.app.Fragment
 import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
-import com.example.clothes.ndSonActivity.ndSonSettingsActivity
 import com.google.android.material.bottomnavigation.BottomNavigationView
 
 
