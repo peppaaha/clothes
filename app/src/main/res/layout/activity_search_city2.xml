@@ -17,6 +17,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:padding="3dp"
+        android:singleLine="true"
         android:hint="搜索国内城市："
         android:background="@drawable/farg_1"/>
     <TextView

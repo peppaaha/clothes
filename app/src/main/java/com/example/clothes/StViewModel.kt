@@ -1,44 +1,23 @@
 package com.example.clothes
 
-import android.Manifest
-import android.Manifest.permission.ACCESS_COARSE_LOCATION
-import android.app.Activity
-import android.app.Application
-import android.content.Context.LOCATION_SERVICE
 import android.content.Intent
-import android.content.pm.PackageManager
-import android.location.Location
-import android.location.LocationListener
-import android.location.LocationManager
-import android.os.Build
 import android.util.Log
 import android.widget.Toast
-import androidx.annotation.RequiresApi
-import androidx.core.app.ActivityCompat
-import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import com.example.clothes.stSonActivity.WeatherDetailsBean
 import com.google.gson.Gson
-import com.google.gson.reflect.TypeToken
 import okhttp3.*
 import java.io.IOException
-import java.lang.Exception
-import java.util.concurrent.Executor
-import java.util.function.Consumer
+import java.lang.Math.ceil
+import java.lang.Math.floor
 import java.util.regex.Pattern
 import kotlin.concurrent.thread
 
 
-data class Weather(val data : Data, val status : Int, val desc : String) {
-    data class Data(val yesterday : Yesterday, val city : String, val forecast : List<FutureWeather>, val ganmao : String, val wendu : String)
-    data class Yesterday(val date : String, val high : String, val fx : String, val low : String, val fl : String, val type : String)
-    data class FutureWeather(val date : String, val high : String, val fengli : String, val low : String, val fengxiang : String, val type : String)
-}
-
-
 class StViewModel() : ViewModel() {
     object HttpUtil {
-        fun sendOkHttpRequest(address: String, callback : Callback) {
+        fun sendOkHttpRequest(address: String, callback: Callback) {
             val client = OkHttpClient()
             val request = Request.Builder()
                 .url(address)
@@ -47,21 +26,24 @@ class StViewModel() : ViewModel() {
         }
     }
 
-    fun getWeatherFromOkHttp(httpUrl : String) {
+    fun getWeatherFromOkHttp(httpUrl: String) {
         HttpUtil.sendOkHttpRequest(httpUrl, object : Callback {
             override fun onResponse(call: Call, response: Response) {
+                Log.d("StViewModel", "connecting internet on success")
                 thread {
                     try {
                         val responseData = response.body?.string()
-                        if(responseData != null) {
+                        if (responseData != null) {
                             parseJSONWithGSON(responseData)
                         }
-                    } catch(e : Exception) {
+                    } catch (e: Exception) {
                         e.printStackTrace()
                     }
                 }
             }
+
             override fun onFailure(call: Call, e: IOException) {
+                Log.d("StViewModel", "connecting internet on failure")
                 e.printStackTrace()
             }
         })
@@ -69,34 +51,74 @@ class StViewModel() : ViewModel() {
 
     val weatherReturnToFragment = MutableLiveData<Intent>()
 
-    fun stringToPureNumber(oldString : String) : String {
-        val newString = StringBuffer()
-        //使用正则表达式， 让字符中只留下 负号 和 数字
-        val matcher = Pattern.compile("-?\\d").matcher(oldString)
-        while (matcher.find()) {
-            newString.append(matcher.group())
-        }
-        return newString.toString()
-    }
 
     private fun parseJSONWithGSON(jsonData: String) {
         val gson = Gson()
-        val weather = gson.fromJson(jsonData, Weather::class.java)
+        val weather = gson.fromJson(jsonData, WeatherDetailsBean::class.java)
         // 使用LiveData让view对viewModel中值的改变进行监听
         // 通过Intent传递信息
-        weatherReturnToFragment.postValue(Intent().apply {
-
-
-            putExtra("high", stringToPureNumber(weather.data.forecast[0].high)+"°")
-            putExtra("low", stringToPureNumber(weather.data.forecast[0].low)+"°")
-            putExtra("type", weather.data.forecast[0].type)
-        })
-
-        Log.d("Weather", "high is ${weather.data.forecast[0].high}")
-        Log.d("Weather", "fengli is ${weather.data.forecast[0].fengli}")
-        Log.d("Weather", "low is ${weather.data.forecast[0].low}")
-        Log.d("Weather", "type is ${weather.data.forecast[0].type}")
+        val intent = Intent().apply {
+            putExtra("temperature", Tools.convertDoubleToIntByRounding(weather.result.realtime.temperature)
+                .toString()
+                    + "°")
+            putExtra("weather",
+                Tools.convertEnglishWeatherToChinese(weather.result.realtime.skycon)
+            )
+            putExtra("humidity", (weather.result.realtime.humidity * 100).toInt().toString()
+                    + "%")
+        }
+        weatherReturnToFragment.postValue(intent)
+        Log.d("Weather", "temperature is ${weather.result.realtime.temperature}")
     }
+
+    object Tools {
+        fun convertStringToPureNumber(oldString: String) : String {
+            val newString = StringBuffer()
+            //使用正则表达式， 让字符中只留下 负号 和 数字
+            val matcher = Pattern.compile("-?\\d").matcher(oldString)
+            while (matcher.find()) {
+                newString.append(matcher.group())
+            }
+            return newString.toString()
+        }
+        // 四舍五入
+        fun convertDoubleToIntByRounding(doubleNum : Double) : Int {
+            val floorNum = kotlin.math.floor(doubleNum)
+            return if(doubleNum - floorNum >= 0.5) {
+                kotlin.math.ceil(doubleNum).toInt()
+            } else {
+                floorNum.toInt()
+            }
+        }
+
+        fun convertEnglishWeatherToChinese(englishString : String) : String = when(englishString) {
+            "CLEAR_DAY" -> "晴"
+            "CLEAR_NIGHT" -> "晴"
+            "PARTLY_CLOUDY_DAY" -> "多云"
+            "PARTLY_CLOUDY_NIGHT" -> "多云"
+            "CLOUDY" -> "阴"
+            "LIGHT_HAZE" -> "轻度雾霾"
+            "MODERATE_HAZE" -> "中度雾霾"
+            "HEAVY_HAZE" -> "重度雾霾"
+            "LIGHT_RAIN" -> "小雨"
+            "MODERATE_RAIN" -> "中雨"
+            "HEAVY_RAIN" -> "大雨"
+            "STORM_RAIN" -> "暴雨"
+            "FOG" -> "雾"
+            "LIGHT_SNOW" -> "小雪"
+            "MODERATE_SNOW" -> "中雪"
+            "HEAVY_SNOW" -> "大雪"
+            "STORM_SNOW" -> "暴雪"
+            "DUST" -> "浮尘"
+            "SAND" -> "沙尘"
+            "WIND" -> "大风"
+            else -> {
+                Log.e("getting weather", "There is no corresponding weather.")
+                "ERROR"
+            }
+        }
+    }
+
     /*
     @RequiresApi(Build.VERSION_CODES.N)
     internal object LocationConsumer : Consumer<Location> {

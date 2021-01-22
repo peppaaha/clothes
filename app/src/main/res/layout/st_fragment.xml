@@ -40,11 +40,11 @@
             android:layout_marginLeft="50dp"
             android:layout_marginTop="120dp"
 
-            android:text="-3°"
-
             android:textColor="@color/colorAccent"
 
             android:textSize="75sp" />
+
+         <!--   android:text="-3°" -->
 
         <TextView
 
@@ -54,11 +54,11 @@
 
             android:layout_height="wrap_content"
             android:layout_marginTop="120dp"
-            android:text="晴"
 
             android:textColor="@color/colorAccent"
 
             android:textSize="25sp" />
+            <!--android:text="晴"-->
     </LinearLayout>
 
     <LinearLayout
@@ -77,9 +77,8 @@
             android:layout_marginStart="30dp"
 
             android:layout_marginTop="60dp"
-
-            android:gravity="right"
             android:text="北京市"
+            android:gravity="right"
             android:textColor="@color/colorAccent"
             android:textSize="25sp" />
 
@@ -101,11 +100,11 @@
 
             android:layout_height="wrap_content"
             android:layout_marginTop="60dp"
-            android:text="40%"
 
             android:textColor="@color/colorAccent"
-
+            android:text="Connecting"
             android:textSize="25sp" />
+          <!--  android:text="40%" -->
 
     </LinearLayout>
 
