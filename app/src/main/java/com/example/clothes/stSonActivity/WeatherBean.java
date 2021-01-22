@@ -17,6 +17,14 @@ import java.util.List;
         private String query;
         private List<PlacesBean> places;
 
+        public List<PlacesBean> getPlaces() {
+            return places;
+        }
+
+        public void setPlaces(List<PlacesBean> places) {
+            this.places = places;
+        }
+
         @lombok.Data
         public static class PlacesBean implements Serializable {
             /**
@@ -33,6 +41,11 @@ import java.util.List;
             private String name;
             private String formatted_address;
 
+            public String getName(){
+                return name ;
+            }
+
+
             @lombok.Data
             public static class LocationBean implements Serializable {
                 /**
@@ -42,6 +55,14 @@ import java.util.List;
 
                 private double lat;
                 private double lng;
+
+                public double getLng() {
+                    return lng;
+                }
+
+                public double getLat() {
+                    return lat;
+                }
             }
         }
     }

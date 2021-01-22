@@ -3,16 +3,20 @@ package com.example.clothes;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.GridView;
 import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 import com.example.clothes.stSonActivity.BaseAcitivity;
 import com.example.clothes.stSonActivity.WeatherBean;
 import com.google.gson.Gson;
+
+import java.util.List;
 
 public class SearchCityActivity extends BaseAcitivity implements View.OnClickListener{
 
@@ -32,6 +36,7 @@ public class SearchCityActivity extends BaseAcitivity implements View.OnClickLis
         searchEt = findViewById(R.id.search_et);
         submitIv = findViewById(R.id.search_iv_submit);
         searchGv = findViewById(R.id.search_gv);
+        submitIv.setOnClickListener(this);
 
         adapter = new ArrayAdapter<>(this, R.layout.item_hotcity, hotCitys);
         searchGv.setAdapter(adapter);
@@ -46,8 +51,6 @@ public class SearchCityActivity extends BaseAcitivity implements View.OnClickLis
                 String url = url1+city+url2;
                 loadData(url);
             }
-
-
         });
     }
 
@@ -69,15 +72,15 @@ public class SearchCityActivity extends BaseAcitivity implements View.OnClickLis
     }
     @Override
     public void onSuccess(String result) {
-
+        Log.d("SearchCityActivity", "onSuccess");
         WeatherBean weatherBean = new Gson().fromJson(result, WeatherBean.class);
-
-            /*跳转到某页面
-            Intent intent = new Intent(this, stFragment.class);
+        WeatherBean.PlacesBean placesBean = weatherBean.getPlaces().get(0);
+        //跳转到某页面
+            Intent intent = new Intent();
             intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK|Intent.FLAG_ACTIVITY_NEW_TASK);
-            intent.putExtra("city",city);
-            startActivity(intent);~~>*/
-
+            intent.putExtra("city",placesBean.getName());
+            setResult(RESULT_OK, intent);
+            Log.d("SearchCityActivity", "Ready to finish");
+            finish();
     }
-
 }

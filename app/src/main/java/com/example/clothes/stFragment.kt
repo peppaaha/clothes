@@ -1,40 +1,36 @@
 package com.example.clothes
 
+import android.app.Activity.RESULT_OK
 import android.content.Intent
-import android.media.Image
-import androidx.lifecycle.ViewModelProviders
 import android.os.Bundle
-import androidx.fragment.app.Fragment
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
-import android.widget.Toast
-import androidx.appcompat.app.AppCompatActivity
-import androidx.core.content.ContextCompat
 import androidx.core.content.ContextCompat.startActivity
-import androidx.lifecycle.observe
-import androidx.recyclerview.widget.DividerItemDecoration
-import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.example.clothes.stSonActivity.stSonClothesDetailActivity
-import okhttp3.Call
-import okhttp3.Response
-import java.io.IOException
+import kotlinx.android.synthetic.main.st_fragment.*
 import java.util.*
 import kotlin.collections.ArrayList
-import kotlin.concurrent.thread
 
 
-class stFragment : Fragment() {
+class stFragment : BaseFragment() {
 
+/*    val url3 = " https://api.caiyunapp.com/v2.5/C4JPhPDPmukH7xBe/"
+    val url4 = ","
+    val url5 = "/realtime.jsonp?callback=MYCALLBACK"
+    var lng: String? = null
+    var lat: String? = null
 
     companion object {
         fun newInstance() = stFragment()
     }
-
+*/
     private val clothesList = ArrayList<stFragmentClothes>()
 
     private lateinit var viewModel: StViewModel
@@ -55,10 +51,26 @@ class stFragment : Fragment() {
             temperature.text = it.getStringExtra("low")
         })
         initCalendar(newView)
+
+/*        val bundle = arguments
+        val city = bundle!!.getString("city")
+        val urla = url3 + lng + url4 + lat + url5
+        loadData(urla)
+*/
         return newView
     }
 
-    private fun initCalendar(newView : View) {
+/*    override fun onSuccess(result: String?) {
+        //解析
+        parseShowData(result)
+    }
+
+    private fun parseShowData(result: String?) {
+        val weatherBean = Gson().fromJson(result, TrueWeatherBean::class.java)
+        //be continue...
+    }
+*/
+    private fun initCalendar(newView: View) {
         val calendar = Calendar.getInstance()
         val year = calendar.get(Calendar.YEAR)
         val month = calendar.get(Calendar.MONTH) + 1  // The first month is 0
@@ -67,7 +79,7 @@ class stFragment : Fragment() {
         dateTextView.text = "$year-$month-$date"
     }
 
-    private fun initClothesListRecyclerView(newView : View) {
+    private fun initClothesListRecyclerView(newView: View) {
         initClothes()
         val layoutManager = StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL)
         val stFragmentrecyclerView : RecyclerView = newView.findViewById(R.id.stFragmentRecyclerView)
@@ -86,7 +98,28 @@ class stFragment : Fragment() {
         super.onActivityCreated(savedInstanceState)
         viewModel = ViewModelProviders.of(this).get(StViewModel::class.java)
         // TODO: Use the ViewModel
+        locate.setOnClickListener {
+            val intent = Intent(getActivity(), SearchCityActivity::class.java)
+            startActivityForResult(intent, 1)
+        }
     }
+
+
+
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        Log.d("stFragment", "returned data is aha")
+        when (requestCode) {
+            1 ->  {
+                val returnedData = data?.getStringExtra("city")
+                Log.d("stFragment", "returned data is $returnedData")
+                val locateTextView = view?.findViewById(R.id.locate) as TextView
+                locateTextView.text = "$returnedData"
+            }
+        }
+    }
+
 
 }
 
