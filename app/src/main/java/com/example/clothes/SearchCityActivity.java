@@ -26,7 +26,7 @@ public class SearchCityActivity extends BaseAcitivity implements View.OnClickLis
     EditText searchEt;
     ImageView submitIv;
     GridView searchGv;
-    String[]hotCitys = {"北京","上海","广州","深圳","明光桥中学附属大学","太原","石家庄","哈尔滨","重庆", "武汉"};
+    String[]hotCitys = {"北京","上海","广州","保定","明光桥中学附属大学","太原","石家庄","哈尔滨","庄里", "伦敦玛丽女王大学"};
     private ArrayAdapter<String> adapter;
     String url1 = "https://api.caiyunapp.com/v2/place?query=";
     String url2 = "&token=C4JPhPDPmukH7xBe&lang=zh_CN";
