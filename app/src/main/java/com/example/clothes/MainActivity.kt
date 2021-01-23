@@ -1,5 +1,6 @@
 package com.example.clothes
 
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
@@ -21,6 +22,13 @@ class MainActivity : AppCompatActivity() {
         hideActionBar()
         initNavigation()
   //      requestWindowFeature(Window.FEATURE_NO_TITLE)
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        val editor = this.getSharedPreferences("temp_weather", Context.MODE_PRIVATE)?.edit()
+        editor?.clear()
+        editor?.commit()
     }
 
     private fun initNavigation() {

@@ -44,7 +44,7 @@ import java.util.List;
             public String getName(){
                 return name ;
             }
-
+            public LocationBean getLocation() { return location; }
 
             @lombok.Data
             public static class LocationBean implements Serializable {
