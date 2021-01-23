@@ -92,6 +92,8 @@ public class SearchCityActivity extends BaseAcitivity implements View.OnClickLis
             intent.putExtra("city",placesBean.getName());
             intent.putExtra("lng",locationBean.getLng());
             intent.putExtra("lat",locationBean.getLat());
+            //永久存储
+            //TODO ：改写成类 并用JSON存储
             SharedPreferences.Editor editor = getApplication().getSharedPreferences("user_location", Context.MODE_PRIVATE).edit();
             editor.putFloat("lng", (float) locationBean.getLng());
             editor.putFloat("lat", (float) locationBean.getLat());

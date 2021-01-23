@@ -1,5 +1,10 @@
 package com.example.clothes.stSonActivity
+
+import android.os.Parcelable
+import kotlinx.android.parcel.Parcelize
+
 // https://api.caiyunapp.com/v2.5/C4JPhPDPmukH7xBe/116.512885,39.847469/realtime.json
+@Parcelize
 data class WeatherDetailsBean(
     val api_status: String,
     val api_version: String,
@@ -11,13 +16,15 @@ data class WeatherDetailsBean(
     val timezone: String,
     val tzshift: Int,
     val unit: String
-)
+): Parcelable
 
+@Parcelize
 data class Result(
     val primary: Int,
     val realtime: Realtime
-)
+): Parcelable
 
+@Parcelize
 data class Realtime(
     val air_quality: AirQuality,
     val apparent_temperature: Double,
@@ -32,8 +39,9 @@ data class Realtime(
     val temperature: Double,
     val visibility: Double,
     val wind: Wind
-)
+): Parcelable
 
+@Parcelize
 data class AirQuality(
     val aqi: Aqi,
     val co: Double,
@@ -43,54 +51,63 @@ data class AirQuality(
     val pm10: Double,
     val pm25: Double,
     val so2: Double
-)
+): Parcelable
 
+@Parcelize
 data class LifeIndex(
     val comfort: Comfort,
     val ultraviolet: Ultraviolet
-)
+): Parcelable
 
+@Parcelize
 data class Precipitation(
     val local: Local,
     val nearest: Nearest
-)
+): Parcelable
 
+@Parcelize
 data class Wind(
     val direction: Double,
     val speed: Double
-)
+): Parcelable
 
+@Parcelize
 data class Aqi(
     val chn: Double,
     val usa: Double
-)
+): Parcelable
 
+@Parcelize
 data class Description(
     val chn: String,
     val usa: String
-)
+): Parcelable
 
+@Parcelize
 data class Comfort(
     val desc: String,
     val index: Int
-)
+): Parcelable
 
+@Parcelize
 data class Ultraviolet(
     val desc: String,
     val index: Double
-)
+): Parcelable
 
+@Parcelize
 data class Local(
     val datasource: String,
     val intensity: Double,
     val status: String
-)
+): Parcelable
 
+@Parcelize
 data class Nearest(
     val distance: Double,
     val intensity: Double,
     val status: String
-)
+): Parcelable
 
 /*
 JSON

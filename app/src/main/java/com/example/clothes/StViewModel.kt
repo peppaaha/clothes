@@ -1,22 +1,41 @@
 package com.example.clothes
 
+import android.app.Application
+import android.content.Context
 import android.content.Intent
+import android.os.Parcelable
+import android.provider.Settings.Global.putInt
 import android.util.Log
+import android.view.View
 import android.widget.Toast
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import com.example.clothes.stSonActivity.Realtime
 import com.example.clothes.stSonActivity.WeatherDetailsBean
 import com.google.gson.Gson
+import kotlinx.android.parcel.Parcelize
 import okhttp3.*
 import java.io.IOException
 import java.lang.Math.ceil
 import java.lang.Math.floor
+import java.util.*
 import java.util.regex.Pattern
 import kotlin.concurrent.thread
+import kotlin.math.abs
+import kotlin.math.cos
+import kotlin.math.exp
+import kotlin.math.sin
 
+@Parcelize
+data class WeatherString(val temperature: String, val weather: String, val humidity: String): Parcelable
 
-class StViewModel() : ViewModel() {
-    object HttpUtil {
+class StViewModel(application: Application) : AndroidViewModel(application) {
+
+    val weatherReturnToFragment = MutableLiveData<Intent>()
+    val clothesLevelReturnToFragment = MutableLiveData<Int>()
+
+    companion object HttpUtil {
         fun sendOkHttpRequest(address: String, callback: Callback) {
             val client = OkHttpClient()
             val request = Request.Builder()
@@ -25,6 +44,16 @@ class StViewModel() : ViewModel() {
             client.newCall(request).enqueue(callback)
         }
     }
+
+
+    fun getWeatherByLngAndLat(lng: Double, lat: Double) {
+        val url1 = "https://api.caiyunapp.com/v2.5/C4JPhPDPmukH7xBe/"
+        val url2 = "/realtime.json"
+        val httpUrl = "$url1$lng,$lat$url2"
+        Log.d("stFragment", "ready to start viewmodel getWeatherFromOkHttp function")
+        getWeatherFromOkHttp(httpUrl)
+    }
+
 
     fun getWeatherFromOkHttp(httpUrl: String) {
         HttpUtil.sendOkHttpRequest(httpUrl, object : Callback {
@@ -49,30 +78,90 @@ class StViewModel() : ViewModel() {
         })
     }
 
-    val weatherReturnToFragment = MutableLiveData<Intent>()
-
-
     private fun parseJSONWithGSON(jsonData: String) {
         val gson = Gson()
         val weather = gson.fromJson(jsonData, WeatherDetailsBean::class.java)
         // 使用LiveData让view对viewModel中值的改变进行监听
         // 通过Intent传递信息
         val intent = Intent().apply {
+            putExtra("realtime", weather.result.realtime)
+            val weatherString = WeatherString(Tools.convertDoubleToIntByRounding(weather.result.realtime.temperature).toString() + "°",
+                Tools.convertEnglishWeatherToChinese(weather.result.realtime.skycon),
+                (weather.result.realtime.humidity * 100).toInt().toString() + "%")
+            putExtra("weatherString", weatherString)
+            /*
             putExtra("temperatureNum", weather.result.realtime.temperature)
             putExtra("humidityNum", weather.result.realtime.humidity)
-            putExtra("temperature", Tools.convertDoubleToIntByRounding(weather.result.realtime.temperature)
-                .toString()
-                    + "°")
-            putExtra("weather",
-                Tools.convertEnglishWeatherToChinese(weather.result.realtime.skycon)
-            )
-            putExtra("humidity", (weather.result.realtime.humidity * 100).toInt().toString()
-                    + "%")
             putExtra("windSpeed", weather.result.realtime.wind.speed)
+            */
         }
         weatherReturnToFragment.postValue(intent)
         Log.d("Weather", "temperature is ${weather.result.realtime.temperature}")
     }
+
+    fun calcClothesLevel(realtime: Realtime) {
+        val prefs_location = getApplication<Application>().getSharedPreferences("user_location", Context.MODE_PRIVATE)
+        val lat = prefs_location?.getFloat("lat", 0.0F)
+        val calendar = Calendar.getInstance()
+        val month = calendar.get(Calendar.MONTH) + 1
+        val sinPart = 1.0 - 0.3 * sin(lat?.minus(23.5F)!!)
+        val cosPart = 0.3 * cos((15 * (month - 1)).toDouble())
+        val temperatureComfortable = 22.7 * sinPart - abs(cosPart) //T_s 舒适温度
+        Log.d("StViewModel", "temperatureComfortable is $temperatureComfortable")
+        val temperatureAir = realtime.temperature //T_a 空气温度
+        Log.d("StViewModel", "temperatureAir is $temperatureAir")
+        var c1 : Double
+        var c2 : Double
+        var c3 : Double
+        var c4 : Double
+        if(temperatureAir >= temperatureComfortable) {
+            c1 = 1.0
+            c2 = 0.05
+            c3 = -1.0
+            c4 = -0.03
+        } else {
+            c1 = -1.0
+            c2 = -0.013
+            c3 = 1.0
+            c4 = 0.01
+        }
+        val windSpeedNum = realtime.wind.speed
+        val humidityNum = realtime.humidity
+        val expPart = c2 * (temperatureAir - temperatureComfortable) * (humidityNum - 0.5)
+        val temperatureBody = temperatureAir + 14 * c1 * (exp(expPart) + c3)+ c4 * (temperatureAir - temperatureComfortable) * windSpeedNum //体感温度
+        Log.d("StViewModel", "expPart is $expPart")
+        Log.d("StViewModel", "expPartAfter is ${exp(expPart)}")
+        Log.d("StViewModel", "windSpeed is $windSpeedNum")
+        Log.d("StViewModel", "temperatureBody is $temperatureBody")
+        val delta = 22.7 - temperatureComfortable
+        var level : Int
+        if(temperatureBody > 32 - delta) {
+            level = 4
+        } else if(temperatureBody > 29 - delta) {
+            level = 3
+        } else if(temperatureBody > 25 - delta) {
+            level = 2
+        } else if(temperatureBody > 23 - delta) {
+            level = 1
+        } else if(temperatureBody > 18 - delta) {
+            level = 0
+        } else if(temperatureBody > 13 - delta) {
+            level = -1
+        } else if(temperatureBody > 6 - delta) {
+            level = -2
+        } else if(temperatureBody > -2 - delta) {
+            level = -3
+        } else if(temperatureBody > -10 - delta) {
+            level = -4
+        } else if(temperatureBody > -20 - delta) {
+            level = -5
+        } else {
+            level = -6
+        }
+        clothesLevelReturnToFragment.postValue(level)
+    }
+
+
 
     object Tools {
         fun convertStringToPureNumber(oldString: String) : String {

@@ -16,6 +16,7 @@ import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.example.clothes.R.drawable.rain
+import com.example.clothes.stSonActivity.Realtime
 import com.example.clothes.stSonActivity.stSonClothesDetailActivity
 import kotlinx.android.synthetic.main.st_fragment.*
 import java.util.*
@@ -81,12 +82,6 @@ class stFragment : BaseFragment() {
         }
     }
 
-    override fun onDetach() {
-        super.onDetach()
-        Log.d("stFragment", "on Detach")
-    }
-
-
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         Log.d("stFragment", "returned data is aha")
@@ -99,89 +94,29 @@ class stFragment : BaseFragment() {
 
 
     private fun createLiveDataObserver(newView: View) {
+        val editor = context?.getSharedPreferences("temp_weather", Context.MODE_PRIVATE)?.edit()
         viewModel.weatherReturnToFragment.observe(viewLifecycleOwner, androidx.lifecycle.Observer {
-            setWeatherDetailTextView(newView, it.getStringExtra("temperature"),
-                it.getStringExtra("weather"), it.getStringExtra("humidity"))
-            val editor = context?.getSharedPreferences("temp_weather", Context.MODE_PRIVATE)?.edit()
+            val realtime = it.getParcelableExtra<Realtime>("realtime")
+            val weatherString = it.getParcelableExtra<WeatherString>("weatherString")
+            setWeatherDetailTextView(newView, weatherString?.temperature,
+                weatherString?.weather, weatherString?.humidity)
             Log.d("stFragment", "saving weather")
-            editor?.putString("temperature", it.getStringExtra("temperature"))
-            editor?.putString("weather", it.getStringExtra("weather"))
-            editor?.putString("humidity", it.getStringExtra("humidity"))
-            //Unnecessary
-            editor?.putFloat("temperatureNum", it.getDoubleExtra("temperatureNum", 0.0).toFloat())
-            editor?.putFloat("windSpeed", it.getDoubleExtra("windSpeed", 0.0).toFloat())
-            editor?.putFloat("humidityNum", it.getDoubleExtra("humidityNum", 0.0).toFloat())
+            //临时存储 简单一些
+            editor?.putString("temperature", weatherString?.temperature)
+            editor?.putString("weather", weatherString?.weather)
+            editor?.putString("humidity", weatherString?.humidity)
             editor?.apply()
-            calcClothesLevel(newView)
+            viewModel.calcClothesLevel(realtime!!)
+        })
+
+        viewModel.clothesLevelReturnToFragment.observe(viewLifecycleOwner, androidx.lifecycle.Observer {
+            Log.d("stFragment", "level is $it return from viewModel")
+            setLevelTextView(newView, it)
+            editor?.putInt("level", it)
+            editor?.apply()
         })
     }
 
-    private fun calcClothesLevel(newView: View) {
-        val prefs_weather = context?.getSharedPreferences("temp_weather", Context.MODE_PRIVATE)
-        val prefs_location = context?.getSharedPreferences("user_location", Context.MODE_PRIVATE)
-        val lat = prefs_location?.getFloat("lat", 0.0F)
-        val calendar = Calendar.getInstance()
-        val month = calendar.get(Calendar.MONTH) + 1
-        val sinPart = 1.0 - 0.3 * sin(lat?.minus(23.5F)!!)
-        val cosPart = 0.3 * cos((15 * (month - 1)).toDouble())
-        val temperatureComfortable = 22.7 * sinPart - abs(cosPart) //T_s
-        Log.d("stFragment", "temperatureComfortable is $temperatureComfortable")
-        val temperatureAir = prefs_weather?.getFloat("temperatureNum", 0.0F)?.toInt() //T_a
-        Log.d("stFragment", "temperatureAir is $temperatureAir")
-        var c1 : Double
-        var c2 : Double
-        var c3 : Double
-        var c4 : Double
-        if(temperatureAir!! >= temperatureComfortable) {
-            c1 = 1.0
-            c2 = 0.05
-            c3 = -1.0
-            c4 = -0.03
-        } else {
-            c1 = -1.0
-            c2 = -0.013
-            c3 = 1.0
-            c4 = 0.01
-        }
-        val humidityNum = prefs_weather.getFloat("humidityNum", 0.0F)
-        val windSpeed = prefs_weather.getFloat("windSpeed", 0.0F)
-        val expPart = c2 * (temperatureAir - temperatureComfortable) * (humidityNum - 0.5)
-        val temperatureBody = temperatureAir + 14 * c1 * (exp(expPart) + c3)+ c4 * (temperatureAir - temperatureComfortable) * windSpeed
-        Log.d("stFragment", "expPart is $expPart")
-        Log.d("stFragment", "expPartAfter is ${exp(expPart)}")
-        Log.d("stFragment", "windSpeed is $windSpeed")
-        Log.d("stFragment", "temperatureBody is $temperatureBody")
-        val delta = 22.7 - temperatureComfortable
-        var level : Int
-        if(temperatureBody > 32 - delta) {
-            level = 4
-        } else if(temperatureBody > 29 - delta) {
-            level = 3
-        } else if(temperatureBody > 25 - delta) {
-            level = 2
-        } else if(temperatureBody > 23 - delta) {
-            level = 1
-        } else if(temperatureBody > 18 - delta) {
-            level = 0
-        } else if(temperatureBody > 13 - delta) {
-            level = -1
-        } else if(temperatureBody > 6 - delta) {
-            level = -2
-        } else if(temperatureBody > -2 - delta) {
-            level = -3
-        } else if(temperatureBody > -10 - delta) {
-            level = -4
-        } else if(temperatureBody > -20 - delta) {
-            level = -5
-        } else {
-            level = -6
-        }
-        prefs_weather.edit().apply {
-            putInt("level", level)
-            apply()
-        }
-        setLevelTextView(newView, level)
-    }
 
     //1.判断程序是否是第一次运行（以后可以移到MainActivity里）
     //2.联网获取天气信息
@@ -192,6 +127,7 @@ class stFragment : BaseFragment() {
         Log.d("stFragment", "city is ${prefs_location?.getString("city", null)}")
         if(prefs_location?.getString("city", null) == null) {
             Toast.makeText(context, "程序第一次运行，请先输入您的城市", Toast.LENGTH_SHORT).show()
+            //默认城市
             prefs_location?.edit()?.apply {
                 putFloat("lng", 116.512885F)
                 putFloat("lat", 39.847469F)
@@ -218,7 +154,7 @@ class stFragment : BaseFragment() {
                 setLevelTextView(newView, level)
                 Log.d("stFragment", "temperature is ${prefs_weather.getString("temperature", null)} after")
             } else {
-                getWeatherByLngAndLat(savedLng.toDouble(), savedLat.toDouble())
+                viewModel.getWeatherByLngAndLat(savedLng.toDouble(), savedLat.toDouble())
             }
         }
     }
@@ -252,14 +188,6 @@ class stFragment : BaseFragment() {
             "大风" -> R.drawable.wind
             else -> R.drawable.rain
         })
-    }
-
-    private fun getWeatherByLngAndLat(lng: Double, lat: Double) {
-        val url1 = "https://api.caiyunapp.com/v2.5/C4JPhPDPmukH7xBe/"
-        val url2 = "/realtime.json"
-        val httpUrl = "$url1$lng,$lat$url2"
-        Log.d("stFragment", "ready to start viewmodel getWeatherFromOkHttp function")
-        viewModel.getWeatherFromOkHttp(httpUrl)
     }
 
     private fun initCalendar(newView: View) {
