@@ -15,13 +15,25 @@
         android:layout_gravity="center_horizontal"
     />
 
-    <TextView
+    <ImageView
+        android:id="@+id/clothes_pic"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textSize="50sp"
-        android:layout_marginTop="20dp"
+        android:maxWidth="300dp"
+        android:minWidth="300dp"
+        android:adjustViewBounds="true"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="10dp"
+        />
+
+    <TextView
+        android:id="@+id/clothes_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="40sp"
         android:textStyle="bold"
-        android:text="正在制作中..."
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="10dp"
         />
 
 </LinearLayout>

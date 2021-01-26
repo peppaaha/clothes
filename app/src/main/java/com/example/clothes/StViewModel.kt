@@ -4,21 +4,18 @@ import android.app.Application
 import android.content.Context
 import android.content.Intent
 import android.os.Parcelable
-import android.provider.Settings.Global.putInt
+import android.text.TextUtils.lastIndexOf
 import android.util.Log
-import android.view.View
-import android.widget.Toast
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
 import com.example.clothes.stSonActivity.Realtime
+import com.example.clothes.stSonActivity.RemoteServerFilesListBean
 import com.example.clothes.stSonActivity.WeatherDetailsBean
 import com.google.gson.Gson
 import kotlinx.android.parcel.Parcelize
 import okhttp3.*
 import java.io.IOException
-import java.lang.Math.ceil
-import java.lang.Math.floor
+import java.lang.reflect.Array
 import java.util.*
 import java.util.regex.Pattern
 import kotlin.concurrent.thread
@@ -34,6 +31,7 @@ class StViewModel(application: Application) : AndroidViewModel(application) {
 
     val weatherReturnToFragment = MutableLiveData<Intent>()
     val clothesLevelReturnToFragment = MutableLiveData<Int>()
+    val filesListReturnToFragment = MutableLiveData<ArrayList<stFragmentClothes>>()
 
     companion object HttpUtil {
         fun sendOkHttpRequest(address: String, callback: Callback) {
@@ -54,6 +52,10 @@ class StViewModel(application: Application) : AndroidViewModel(application) {
         getWeatherFromOkHttp(httpUrl)
     }
 
+    private fun parseJSONWithGSON(func: (Gson) -> Unit) {
+        val gson = Gson()
+        func(gson)
+    }
 
     fun getWeatherFromOkHttp(httpUrl: String) {
         HttpUtil.sendOkHttpRequest(httpUrl, object : Callback {
@@ -63,7 +65,25 @@ class StViewModel(application: Application) : AndroidViewModel(application) {
                     try {
                         val responseData = response.body?.string()
                         if (responseData != null) {
-                            parseJSONWithGSON(responseData)
+                            parseJSONWithGSON { gson ->
+                                val weather = gson.fromJson(responseData, WeatherDetailsBean::class.java)
+                                // 使用LiveData让view对viewModel中值的改变进行监听
+                                // 通过Intent传递信息
+                                val intent = Intent().apply {
+                                    putExtra("realtime", weather.result.realtime)
+                                    val weatherString = WeatherString(Tools.convertDoubleToIntByRounding(weather.result.realtime.temperature).toString() + "°",
+                                        Tools.convertEnglishWeatherToChinese(weather.result.realtime.skycon),
+                                        (weather.result.realtime.humidity * 100).toInt().toString() + "%")
+                                    putExtra("weatherString", weatherString)
+                                    /*
+                                    putExtra("temperatureNum", weather.result.realtime.temperature)
+                                    putExtra("humidityNum", weather.result.realtime.humidity)
+                                    putExtra("windSpeed", weather.result.realtime.wind.speed)
+                                    */
+                                }
+                                weatherReturnToFragment.postValue(intent)
+                                Log.d("Weather", "temperature is ${weather.result.realtime.temperature}")
+                            }
                         }
                     } catch (e: Exception) {
                         e.printStackTrace()
@@ -78,26 +98,51 @@ class StViewModel(application: Application) : AndroidViewModel(application) {
         })
     }
 
-    private fun parseJSONWithGSON(jsonData: String) {
-        val gson = Gson()
-        val weather = gson.fromJson(jsonData, WeatherDetailsBean::class.java)
-        // 使用LiveData让view对viewModel中值的改变进行监听
-        // 通过Intent传递信息
-        val intent = Intent().apply {
-            putExtra("realtime", weather.result.realtime)
-            val weatherString = WeatherString(Tools.convertDoubleToIntByRounding(weather.result.realtime.temperature).toString() + "°",
-                Tools.convertEnglishWeatherToChinese(weather.result.realtime.skycon),
-                (weather.result.realtime.humidity * 100).toInt().toString() + "%")
-            putExtra("weatherString", weatherString)
-            /*
-            putExtra("temperatureNum", weather.result.realtime.temperature)
-            putExtra("humidityNum", weather.result.realtime.humidity)
-            putExtra("windSpeed", weather.result.realtime.wind.speed)
-            */
-        }
-        weatherReturnToFragment.postValue(intent)
-        Log.d("Weather", "temperature is ${weather.result.realtime.temperature}")
+    var tempArray = ArrayList<stFragmentClothes>()
+    fun getRemoteServerFilesListFromOkHttp(httpUrl: String, prefix: String = "") {
+        HttpUtil.sendOkHttpRequest(httpUrl, object : Callback {
+            override fun onResponse(call: Call, response: Response) {
+                Log.d("StViewModel", "connecting internet on success")
+                Log.d("StViewModel", "this time prefix is $prefix")
+                onResponseDetail(response)
+            }
+
+            override fun onFailure(call: Call, e: IOException) {
+                Log.d("StViewModel", "connecting internet on failure")
+                e.printStackTrace()
+            }
+
+            private fun onResponseDetail(response: Response) {
+                try {
+                    val responseData = response.body?.string()
+                    if (responseData != null) {
+                        parseJSONWithGSON { gson ->
+                            val filesList = gson.fromJson(responseData, RemoteServerFilesListBean::class.java)
+                            // 使用LiveData让view对viewModel中值的改变进行监听
+                            Log.d("StViewModel", "ready to parse JSON (files list)")
+                            for (file in filesList) {
+                                if(file.type == "file") {
+                                    Log.d("StViewModel", "file list url is $httpUrl/${file.name}")
+                                    Log.d("StViewModel", "the first is 1, the last is ${lastIndexOf(file.name, '.')}")
+                                    if(lastIndexOf(file.name, '.') != -1)
+                                        tempArray.add(stFragmentClothes(prefix + file.name.substring(0, lastIndexOf(file.name, '.')),
+                                            "$httpUrl/${file.name}"))
+                                } else if(file.type == "directory") {
+                                    Log.d("StViewModel", "directory list url is $httpUrl/${file.name}")
+                                    getRemoteServerFilesListFromOkHttp("$httpUrl/${file.name}", prefix + file.name)
+                                }
+                            }
+                            filesListReturnToFragment.postValue(tempArray)
+                        }
+                    }
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                }
+            }
+        })
     }
+
+
 
     fun calcClothesLevel(realtime: Realtime) {
         val prefs_location = getApplication<Application>().getSharedPreferences("user_location", Context.MODE_PRIVATE)
@@ -125,17 +170,32 @@ class StViewModel(application: Application) : AndroidViewModel(application) {
             c3 = 1.0
             c4 = 0.01
         }
+        //1
         val windSpeedNum = realtime.wind.speed
         val humidityNum = realtime.humidity
-        val expPart = c2 * (temperatureAir - temperatureComfortable) * (humidityNum - 0.5)
-        val temperatureBody = temperatureAir + 14 * c1 * (exp(expPart) + c3)+ c4 * (temperatureAir - temperatureComfortable) * windSpeedNum //体感温度
+        val weather = realtime.skycon
+        val humidityComfortable = when(weather) {
+            "LIGHT_RAIN", "MODERATE_RAIN", "HEAVY_RAIN" -> 0.618
+            else -> 0.5
+        }
+        Log.d("StViewModel", "humidity comfortable is $humidityComfortable")
+        var humidityWeight = humidityNum - humidityComfortable
+        if(humidityWeight <= 0) humidityWeight = 1.0
+        val expPart = c2 * (temperatureAir - temperatureComfortable) * humidityWeight
+        val temperatureBody = temperatureAir + c1 * 1.4 * (exp(expPart) + c3)+ c4 * (temperatureAir - temperatureComfortable) * windSpeedNum //T_g 体感温度
         Log.d("StViewModel", "expPart is $expPart")
         Log.d("StViewModel", "expPartAfter is ${exp(expPart)}")
         Log.d("StViewModel", "windSpeed is $windSpeedNum")
         Log.d("StViewModel", "temperatureBody is $temperatureBody")
+        //2
+        val expPart2 = 17.27 * temperatureAir / (237.7 + temperatureAir)
+        val ePart2 = humidityNum / 100 * 6.105 * exp(expPart2)
+        val temperatureBody2 = 1.07 * temperatureAir + 0.2 * ePart2 - 0.65 * windSpeedNum -2.7
+        Log.d("StViewModel", "standard temperatureBody is $temperatureBody2")
+        //
         val delta = 22.7 - temperatureComfortable
         var level : Int
-        if(temperatureBody > 32 - delta) {
+        if(temperatureBody2 > 32 - delta) {
             level = 4
         } else if(temperatureBody > 29 - delta) {
             level = 3

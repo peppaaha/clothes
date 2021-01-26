@@ -27,8 +27,10 @@ class MainActivity : AppCompatActivity() {
     override fun onDestroy() {
         super.onDestroy()
         val editor = this.getSharedPreferences("temp_weather", Context.MODE_PRIVATE)?.edit()
-        editor?.clear()
-        editor?.commit()
+        editor?.apply {
+            clear()
+            apply()
+        }
     }
 
     private fun initNavigation() {
