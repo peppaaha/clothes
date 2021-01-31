@@ -12,6 +12,7 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
+import androidx.appcompat.widget.PopupMenu
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat.startActivity
 import androidx.lifecycle.ViewModelProviders
@@ -22,22 +23,14 @@ import com.example.clothes.stSonActivity.stSonClothesDetailActivity
 import com.squareup.picasso.Picasso
 import kotlinx.android.parcel.Parcelize
 import kotlinx.android.synthetic.main.st_fragment.*
+import kotlinx.android.synthetic.main.st_fragment_clothes.*
+import kotlinx.android.synthetic.main.st_fragment_clothes.view.*
 import java.util.*
 import kotlin.collections.ArrayList
 
 
 class stFragment : BaseFragment() {
 
-/*    val url3 = " https://api.caiyunapp.com/v2.5/C4JPhPDPmukH7xBe/"
-    val url4 = ","
-    val url5 = "/realtime.jsonp?callback=MYCALLBACK"
-    var lng: String? = null
-    var lat: String? = null
-
-    companion object {
-        fun newInstance() = stFragment()
-    }
-*/
     private var clothesList = ArrayList<stFragmentClothes>()
 
     private lateinit var viewModel: StViewModel
@@ -51,25 +44,11 @@ class stFragment : BaseFragment() {
         initCalendar(newView)
         createLiveDataObserver(newView)
         getWeather(newView)
-/*        val bundle = arguments
-        val city = bundle!!.getString("city")
-        val urla = url3 + lng + url4 + lat + url5
-        loadData(urla)
-*/
+
         return newView
     }
 
 
-    /*    override fun onSuccess(result: String?) {
-            //解析
-            parseShowData(result)
-        }
-
-        private fun parseShowData(result: String?) {
-            val weatherBean = Gson().fromJson(result, TrueWeatherBean::class.java)
-            //be continue...
-        }
-    */
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
         viewModel = ViewModelProviders.of(this).get(StViewModel::class.java)
@@ -230,7 +209,7 @@ class stFragment : BaseFragment() {
                 val stFragmentrecyclerView: RecyclerView =
                     newView.findViewById(R.id.stFragmentRecyclerView)
                 val layoutManager =
-                    StaggeredGridLayoutManager(3, StaggeredGridLayoutManager.VERTICAL)
+                    StaggeredGridLayoutManager(1, StaggeredGridLayoutManager.VERTICAL)
                 stFragmentrecyclerView.layoutManager = layoutManager
                 clothesList.addAll(it)
                 val adapter = stFragmentAdapter(it)
@@ -255,6 +234,7 @@ class stFragmentAdapter(val clothesList: List<stFragmentClothes>) :
     inner class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val clothesText: TextView = view.findViewById(R.id.clothesText)
         val clothesImage : ImageView = view.findViewById(R.id.clothesImage)
+        val feelImage : ImageView = view.findViewById(R.id.feelImage)
     }
 
     private lateinit var mRecyclerView: RecyclerView
@@ -275,7 +255,33 @@ class stFragmentAdapter(val clothesList: List<stFragmentClothes>) :
             intent.putExtra("clothesDetail", clothes)
             startActivity(parent.context, intent, null)
         }
-        return viewHolder
+        viewHolder.feelImage.setOnClickListener{
+            val position = viewHolder.adapterPosition
+            val clothes = clothesList[position]
+            val popup = PopupMenu(parent.context,view.feelImage)
+            //Inflating the Popup using xml file
+            popup.menuInflater.inflate(R.menu.popup_menu, popup.menu)
+
+            popup.setOnMenuItemClickListener({item ->
+
+                when (item!!.itemId) {
+                    R.id.feeling1 -> {
+                        Toast.makeText(parent.context, item.title, Toast.LENGTH_SHORT).show();
+                    }
+                    R.id.feeling2 -> {
+                        Toast.makeText(parent.context, item.title, Toast.LENGTH_SHORT).show();
+                    }
+                    R.id.feeling3 -> {
+                        Toast.makeText(parent.context, item.title, Toast.LENGTH_SHORT).show();
+                    }
+                }
+                true
+            })
+
+            popup.show()
+        }
+
+            return viewHolder
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {

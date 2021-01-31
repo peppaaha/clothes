@@ -11,7 +11,7 @@
         android:layout_height="wrap_content"
         android:layout_alignParentRight="true"
         android:layout_marginLeft="5dp"
-        android:src="@mipmap/ic_launcher"/>
+        android:src="@mipmap/icon_search"/>
     <EditText
         android:id="@+id/search_et"
         android:layout_width="match_parent"

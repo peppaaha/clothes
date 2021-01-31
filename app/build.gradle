@@ -45,5 +45,6 @@ dependencies {
     compile 'org.xutils:xutils:3.4.0'
     implementation 'org.projectlombok:lombok:1.16.8' //添加lombok依赖
     implementation 'org.glassfish:javax.annotation:10.0-b28' //java注解
-    compile 'com.squareup.picasso:picasso:2.5.2'
+    implementation 'com.squareup.picasso:picasso:2.5.2'
+    implementation 'com.google.android.material:material:1.1.0'
 }
