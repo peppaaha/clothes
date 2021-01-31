@@ -17,16 +17,6 @@
     tools:context=".stFragment">
 
 
-    <ImageView
-
-        android:id="@+id/back1"
-
-        android:layout_width="254dp"
-
-        android:layout_height="268dp"
-
-        app:srcCompat="@drawable/p1" />
-
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
