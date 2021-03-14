@@ -5,9 +5,9 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/background"
-    android:background="@drawable/rain"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@drawable/rain"
     tools:paddingTop="?attr/actionBarSize">
 
     <com.google.android.material.bottomnavigation.BottomNavigationView

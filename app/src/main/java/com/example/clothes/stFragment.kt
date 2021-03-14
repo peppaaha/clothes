@@ -218,7 +218,7 @@ class stFragment : BaseFragment() {
     }
 
     private fun initClothes(level: Int) {
-        val urlRoot = "http://39.97.250.28:8080/images/$level"
+        val urlRoot = "http://8.136.214.13/images/$level"
         viewModel.getRemoteServerFilesListFromOkHttp(urlRoot)
     }
 
@@ -262,7 +262,7 @@ class stFragmentAdapter(val clothesList: List<stFragmentClothes>) :
             //Inflating the Popup using xml file
             popup.menuInflater.inflate(R.menu.popup_menu, popup.menu)
 
-            popup.setOnMenuItemClickListener({item ->
+            popup.setOnMenuItemClickListener { item ->
 
                 when (item!!.itemId) {
                     R.id.feeling1 -> {
@@ -276,7 +276,7 @@ class stFragmentAdapter(val clothesList: List<stFragmentClothes>) :
                     }
                 }
                 true
-            })
+            }
 
             popup.show()
         }
