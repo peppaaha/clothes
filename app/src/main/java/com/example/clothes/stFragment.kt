@@ -15,6 +15,7 @@ import android.widget.Toast
 import androidx.appcompat.widget.PopupMenu
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat.startActivity
+import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
@@ -195,7 +196,7 @@ class stFragment : BaseFragment() {
         val year = calendar.get(Calendar.YEAR)
         val month = calendar.get(Calendar.MONTH) + 1  // The first month is 0
         val date = calendar.get(Calendar.DATE)
-        val dateTextView : TextView = newView.findViewById(R.id.date)
+        val dateTextView: TextView = newView.findViewById(R.id.date)
         dateTextView.text = "$year-$month-$date"
     }
 
@@ -212,7 +213,7 @@ class stFragment : BaseFragment() {
                     StaggeredGridLayoutManager(1, StaggeredGridLayoutManager.VERTICAL)
                 stFragmentrecyclerView.layoutManager = layoutManager
                 clothesList.addAll(it)
-                val adapter = stFragmentAdapter(it)
+                val adapter = stFragmentAdapter(it, this)
                 stFragmentrecyclerView.adapter = adapter
             })
     }
@@ -228,7 +229,7 @@ class stFragment : BaseFragment() {
 @Parcelize
 class stFragmentClothes(val name: String, val imageUrl: String): Parcelable
 
-class stFragmentAdapter(val clothesList: List<stFragmentClothes>) :
+class stFragmentAdapter(val clothesList: List<stFragmentClothes>, val fragment : Fragment) :
     RecyclerView.Adapter<stFragmentAdapter.ViewHolder>() {
 
     inner class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
@@ -261,18 +262,22 @@ class stFragmentAdapter(val clothesList: List<stFragmentClothes>) :
             val popup = PopupMenu(parent.context,view.feelImage)
             //Inflating the Popup using xml file
             popup.menuInflater.inflate(R.menu.popup_menu, popup.menu)
-
+            val viewModel = ViewModelProviders.of(fragment).get(StViewModel::class.java)
             popup.setOnMenuItemClickListener { item ->
 
                 when (item!!.itemId) {
                     R.id.feeling1 -> {
-                        Toast.makeText(parent.context, item.title, Toast.LENGTH_SHORT).show();
+                        viewModel.handleFeedback(1)
+                        Toast.makeText(parent.context, "${item.title}已反馈", Toast.LENGTH_SHORT).show()
+                        Log.d("stFragment", "too cold feedback")
                     }
                     R.id.feeling2 -> {
-                        Toast.makeText(parent.context, item.title, Toast.LENGTH_SHORT).show();
+                        viewModel.handleFeedback(-1)
+                        Toast.makeText(parent.context, "${item.title}已反馈", Toast.LENGTH_SHORT).show()
+                        Log.d("stFragment", "too hot feedback")
                     }
                     R.id.feeling3 -> {
-                        Toast.makeText(parent.context, item.title, Toast.LENGTH_SHORT).show();
+                        Toast.makeText(parent.context, item.title, Toast.LENGTH_SHORT).show()
                     }
                 }
                 true

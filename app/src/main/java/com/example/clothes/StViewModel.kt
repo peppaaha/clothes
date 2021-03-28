@@ -43,6 +43,39 @@ class StViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
+    fun handleFeedback(hotOrColdLevel: Int) { //过热负数 过冷正数
+        val calendar = Calendar.getInstance()
+        val date = calendar.get(Calendar.DATE)
+
+        val prefs_feedback = getApplication<Application>().getSharedPreferences("hot_and_cold_feedback", Context.MODE_PRIVATE)
+        val editor = prefs_feedback.edit()
+
+        val savedDate = prefs_feedback.getInt("date", 0)
+        if(savedDate != date) {
+            editor.putInt("date", date)
+            val hotOrColdLevelTotal = prefs_feedback.getInt("hot_and_cold_feedback_level", 0)
+            val fixedLevel = prefs_feedback.getInt("fixed_level", 0)
+            when {
+                hotOrColdLevelTotal + hotOrColdLevel >= 3 -> {
+                    editor?.putInt("hot_and_cold_feedback_level", 0)
+                    editor?.putInt("fixed_level", fixedLevel + 1)
+                    Log.d("StViewModel", "hotOrColdLevelTotal is 0 now")
+                    Log.d("StViewModel", "fixed_level is ${fixedLevel + 1} now")
+                }
+                hotOrColdLevelTotal + hotOrColdLevel <= -3 -> {
+                    editor?.putInt("hot_and_cold_feedback_level", 0)
+                    editor?.putInt("fixed_level", fixedLevel - 1)
+                    Log.d("StViewModel", "hotOrColdLevelTotal is 0 now")
+                    Log.d("StViewModel", "fixed_level is ${fixedLevel + 1} now")
+                }
+                else -> {
+                    editor?.putInt("hot_and_cold_feedback_level", hotOrColdLevelTotal + hotOrColdLevel)
+                    Log.d("StViewModel", "hotOrColdLevelTotal is ${hotOrColdLevelTotal + hotOrColdLevel} now")
+                }
+            }
+        }
+        editor.apply()
+    }
 
     fun getWeatherByLngAndLat(lng: Double, lat: Double) {
         val url1 = "https://api.caiyunapp.com/v2.5/C4JPhPDPmukH7xBe/"
@@ -218,6 +251,12 @@ class StViewModel(application: Application) : AndroidViewModel(application) {
         } else {
             level = -6
         }
+        //level fixed by feedback
+        val prefs_feedback = getApplication<Application>().getSharedPreferences("hot_and_cold_feedback", Context.MODE_PRIVATE)
+        val fixedLevel = prefs_feedback.getInt("fixed_level", 0)
+        level += fixedLevel
+        if(level > 4) level = 4
+        else if(level < -6) level = -6
         clothesLevelReturnToFragment.postValue(level)
     }
 
