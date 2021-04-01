@@ -26,7 +26,8 @@ public class SearchCityActivity extends BaseAcitivity implements View.OnClickLis
     EditText searchEt;
     ImageView submitIv;
     GridView searchGv;
-    String[]hotCitys = {"北京","上海","广州","深圳","明光桥中学附属大学","太原","石家庄","哈尔滨","武汉","庄里","伦敦玛丽女王大学","保定","北京邮电大学昌平校区"};
+    String[]hotCities = {"北京","上海","广州","深圳","重庆","苏州","成都","杭州","武汉","南京","西安","天津","郑州","长沙","东莞","沈阳","青岛","合肥","佛山","明光桥中学附属大学"};
+//    String[]hotCitys = {"北京","上海","广州","深圳","明光桥中学附属大学","太原","石家庄","哈尔滨","武汉","庄里","伦敦玛丽女王大学","保定","北京邮电大学昌平校区"};
     private ArrayAdapter<String> adapter;
     String url1 = "https://api.caiyunapp.com/v2/place?query=";
     String url2 = "&token=C4JPhPDPmukH7xBe&lang=zh_CN";
@@ -41,7 +42,7 @@ public class SearchCityActivity extends BaseAcitivity implements View.OnClickLis
         searchGv = findViewById(R.id.search_gv);
         submitIv.setOnClickListener(this);
 
-        adapter = new ArrayAdapter<>(this, R.layout.item_hotcity, hotCitys);
+        adapter = new ArrayAdapter<>(this, R.layout.item_hotcity, hotCities);
         searchGv.setAdapter(adapter);
         setListener();
     }
@@ -50,7 +51,8 @@ public class SearchCityActivity extends BaseAcitivity implements View.OnClickLis
         searchGv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                city = hotCitys[position];
+                city = hotCities[position];
+                city += "市";
                 if(city == "明光桥中学附属大学") {
                     city = "北京邮电大学";
                 }

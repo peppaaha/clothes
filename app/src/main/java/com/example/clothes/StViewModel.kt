@@ -162,7 +162,7 @@ class StViewModel(application: Application) : AndroidViewModel(application) {
                                             "$httpUrl/${file.name}"))
                                 } else if(file.type == "directory") {
                                     Log.d("StViewModel", "directory list url is $httpUrl/${file.name}")
-                                    getRemoteServerFilesListFromOkHttp("$httpUrl/${file.name}", prefix + file.name)
+                                //    getRemoteServerFilesListFromOkHttp("$httpUrl/${file.name}", prefix + file.name)
                                 }
                             }
                             filesListReturnToFragment.postValue(tempArray)

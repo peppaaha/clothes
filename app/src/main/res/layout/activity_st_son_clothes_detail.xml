@@ -15,15 +15,11 @@
         android:layout_gravity="center_horizontal"
     />
 
-    <ImageView
-        android:id="@+id/clothes_pic"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:maxWidth="300dp"
-        android:minWidth="300dp"
-        android:adjustViewBounds="true"
-        android:layout_gravity="center_horizontal"
-        android:layout_marginTop="10dp"
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/stSonClothesDetailRecyclerView"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
         />
 
     <TextView
@@ -34,6 +30,7 @@
         android:textStyle="bold"
         android:layout_gravity="center_horizontal"
         android:layout_marginTop="10dp"
+        android:layout_marginBottom="100dp"
         />
 
 </LinearLayout>
