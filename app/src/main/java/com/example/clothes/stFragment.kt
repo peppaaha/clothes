@@ -186,7 +186,7 @@ class stFragment : BaseFragment() {
                 "小雨", "中雨", "大雨", "暴雨" -> R.drawable.rain
                 "小雪", "中雪", "大雪", "暴雪" -> R.drawable.snow
                 "大风" -> R.drawable.wind
-                else -> R.drawable.rain
+                else -> R.drawable.sun
             }
         )
     }
@@ -222,10 +222,9 @@ class stFragment : BaseFragment() {
         val urlRoot = "http://8.136.214.13/images/$level"
         viewModel.getRemoteServerFilesListFromOkHttp(urlRoot)
     }
-
-
 }
 
+//以下为 RecyclerView 部分
 @Parcelize
 class stFragmentClothes(val name: String, val imageUrl: String): Parcelable
 
@@ -264,7 +263,6 @@ class stFragmentAdapter(val clothesList: List<stFragmentClothes>, val fragment :
             popup.menuInflater.inflate(R.menu.popup_menu, popup.menu)
             val viewModel = ViewModelProviders.of(fragment).get(StViewModel::class.java)
             popup.setOnMenuItemClickListener { item ->
-
                 when (item!!.itemId) {
                     R.id.feeling1 -> {
                         viewModel.handleFeedback(1)

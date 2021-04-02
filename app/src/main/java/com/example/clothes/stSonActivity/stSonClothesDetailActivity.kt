@@ -46,11 +46,12 @@ class stSonClothesDetailActivity : AppCompatActivity() {
                     initClothesListRecyclerView()
             }
         }
-    }  //To-Do 替换过失的方法
+    }  //ToDo: 替换过时的方法
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_st_son_clothes_detail)
+        hideActionBar()
         val clothesDetail = intent.getParcelableExtra<stFragmentClothes>("clothesDetail")
         val clothes_url = clothesDetail!!.imageUrl
         Log.d("stSonClothesDetail", "pre pre url is $clothes_url")
@@ -71,10 +72,9 @@ class stSonClothesDetailActivity : AppCompatActivity() {
                                 if (TextUtils.lastIndexOf(file.name, '.') != -1)
                                     tempArray.add(
                                         stSonClothesDetailClothes(
-                                            clothesDetail.name + file.name.substring(
-                                                0,
-                                                TextUtils.lastIndexOf(file.name, '.')
-                                            ), "$httpUrl/${file.name}"
+                                            clothesDetail.name + file.name.substring(0, TextUtils.lastIndexOf(file.name, '.')
+                                            )
+                                            , "$httpUrl/${file.name}"
                                         )
                                     )
                                 Log.d("stSonClothesDetail", "url is $httpUrl/${file.name}")
@@ -120,6 +120,10 @@ class stSonClothesDetailActivity : AppCompatActivity() {
         client.newCall(request).enqueue(callback)
     }
 
+    private fun hideActionBar() {
+        val actionBar = supportActionBar
+        actionBar?.hide()
+    }
 }
 
 
@@ -143,7 +147,7 @@ class stSonClothesDetailAdapter(val clothesList: List<stSonClothesDetailClothes>
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val view = LayoutInflater.from(parent.context)
-            .inflate(R.layout.st_fragment_clothes, parent, false)
+            .inflate(R.layout.st_fragment_clothes_detail, parent, false)
         val viewHolder = ViewHolder(view)
         return viewHolder
     }

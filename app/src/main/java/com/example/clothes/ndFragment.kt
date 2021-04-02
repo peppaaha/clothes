@@ -74,7 +74,7 @@ class ndFragment : Fragment() {
     private fun initOptions() {
         optionList.add(
             ndFragmentOption(
-                "设置", R.drawable.logo, Intent(
+                "设置", R.drawable.icon_setting, Intent(
                     activity,
                     ndSonSettingsActivity::class.java
                 )
@@ -82,7 +82,7 @@ class ndFragment : Fragment() {
         )
         optionList.add(
             ndFragmentOption(
-                "关于", R.drawable.logo, Intent(
+                "关于", R.drawable.icon_information, Intent(
                     activity,
                     ndSonAboutActivity::class.java
                 )

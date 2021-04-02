@@ -21,7 +21,9 @@ import com.google.gson.Gson;
 
 import java.util.List;
 
-public class SearchCityActivity extends BaseAcitivity implements View.OnClickListener{
+import static android.text.TextUtils.lastIndexOf;
+
+public class SearchCityActivity extends BaseAcitivity implements View.OnClickListener {
 
     EditText searchEt;
     ImageView submitIv;
@@ -32,6 +34,7 @@ public class SearchCityActivity extends BaseAcitivity implements View.OnClickLis
     String url1 = "https://api.caiyunapp.com/v2/place?query=";
     String url2 = "&token=C4JPhPDPmukH7xBe&lang=zh_CN";
     String city = "北京邮电大学";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -41,9 +44,9 @@ public class SearchCityActivity extends BaseAcitivity implements View.OnClickLis
         submitIv = findViewById(R.id.search_iv_submit);
         searchGv = findViewById(R.id.search_gv);
         submitIv.setOnClickListener(this);
-
         adapter = new ArrayAdapter<>(this, R.layout.item_hotcity, hotCities);
         searchGv.setAdapter(adapter);
+
         setListener();
     }
 
@@ -52,10 +55,10 @@ public class SearchCityActivity extends BaseAcitivity implements View.OnClickLis
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 city = hotCities[position];
-                city += "市";
                 if(city == "明光桥中学附属大学") {
                     city = "北京邮电大学";
                 }
+                city += "市";
                 SharedPreferences.Editor editor = getApplication().getSharedPreferences("temp_weather", Context.MODE_PRIVATE).edit();
                 editor.clear();
                 editor.commit();
@@ -63,24 +66,27 @@ public class SearchCityActivity extends BaseAcitivity implements View.OnClickLis
                 loadData(url);
             }
         });
+
     }
 
 
     @Override
     public void onClick(View v){
+        Log.d("SearchCityActivity", String.valueOf(v.getId()));
         switch (v.getId()) {
             case R.id.search_iv_submit:
+                Log.d("SearchCityActivity", "search botton is clicked");
                 city = searchEt.getText().toString();
                 if (!TextUtils.isEmpty(city)) {
                     String url = url1 + city + url2;
                     loadData(url);
-
-                }else{
-                    Toast.makeText(this,"输入内容不能为空",Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(this,"输入内容不能为空", Toast.LENGTH_SHORT).show();
                 }
                 break;
         }
     }
+
     @Override
     public void onSuccess(String result) {
         Log.d("SearchCityActivity", "onSuccess");
@@ -96,10 +102,14 @@ public class SearchCityActivity extends BaseAcitivity implements View.OnClickLis
             intent.putExtra("lat",locationBean.getLat());
             //永久存储
             //TODO ：改写成类 并用JSON存储
+            String simplifiedCity = placesBean.getName();
+            //把 市 后面的文字藏起来
+            //比如 北京市政府 -> 北京市
+            simplifiedCity = simplifiedCity.substring(0, lastIndexOf(city, '市') + 1);
             SharedPreferences.Editor editor = getApplication().getSharedPreferences("user_location", Context.MODE_PRIVATE).edit();
             editor.putFloat("lng", (float) locationBean.getLng());
             editor.putFloat("lat", (float) locationBean.getLat());
-            editor.putString("city", placesBean.getName());
+            editor.putString("city", simplifiedCity);
             editor.apply();
             setResult(RESULT_OK, intent);
             Log.d("SearchCityActivity", "Ready to finish");
@@ -110,5 +120,6 @@ public class SearchCityActivity extends BaseAcitivity implements View.OnClickLis
     public void onError(Throwable ex, boolean isOnCallback) {
         Toast.makeText(this, "您可能没有连接网络...", Toast.LENGTH_SHORT).show();
     }
+
 
 }

@@ -4,33 +4,31 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="#EFEFEF"
     android:orientation="vertical"
     tools:context=".stSonActivity.stSonClothesDetailActivity">
 
     <TextView
-        android:layout_width="wrap_content"
+        android:id="@+id/clothes_name"
+        android:layout_width="match_parent"
+        android:background="@drawable/white_rounded_rectangle"
+        android:gravity="center"
         android:layout_height="wrap_content"
-        android:textSize="50sp"
-        android:text="衣物详情界面"
+        android:textSize="35sp"
+        android:layout_marginLeft="15dp"
+        android:layout_marginRight="15dp"
         android:layout_gravity="center_horizontal"
+        android:layout_marginTop="10dp"
     />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/stSonClothesDetailRecyclerView"
+        android:layout_marginTop="10dp"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
         />
 
-    <TextView
-        android:id="@+id/clothes_name"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textSize="40sp"
-        android:textStyle="bold"
-        android:layout_gravity="center_horizontal"
-        android:layout_marginTop="10dp"
-        android:layout_marginBottom="100dp"
-        />
+
 
 </LinearLayout>
