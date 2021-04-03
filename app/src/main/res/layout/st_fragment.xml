@@ -112,6 +112,7 @@
         android:textSize="25sp" />
 
 
+    <!--
     <ImageView
 
         android:id="@+id/logo"
@@ -124,7 +125,7 @@
         android:layout_marginLeft="250dp"
 
         app:srcCompat="@drawable/logo" />
-    <!--
+
         <com.google.android.material.bottomnavigation.BottomNavigationView
             android:id="@+id/bottomNavigationView"
             android:layout_width="match_parent"
@@ -225,10 +226,9 @@
         -->
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/stFragmentRecyclerView"
-            android:layout_weight="1"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            />
+            android:layout_width="383dp"
+            android:layout_height="479dp"
+            android:layout_weight="1" />
 
 
     </LinearLayout>
