@@ -83,6 +83,7 @@ public class SearchCityActivity extends BaseAcitivity implements View.OnClickLis
                 } else {
                     Toast.makeText(this,"输入内容不能为空", Toast.LENGTH_SHORT).show();
                 }
+                city += "市";
                 break;
         }
     }
