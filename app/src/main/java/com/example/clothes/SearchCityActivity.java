@@ -76,8 +76,11 @@ public class SearchCityActivity extends BaseAcitivity implements View.OnClickLis
         switch (v.getId()) {
             case R.id.search_iv_submit:
                 Log.d("SearchCityActivity", "search botton is clicked");
-                city = searchEt.getText().toString();
+                 city = searchEt.getText().toString();
                 if (!TextUtils.isEmpty(city)) {
+                    SharedPreferences.Editor editor = getApplication().getSharedPreferences("temp_weather", Context.MODE_PRIVATE).edit();
+                    editor.clear();
+                    editor.commit();
                     String url = url1 + city + url2;
                     loadData(url);
                 } else {

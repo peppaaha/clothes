@@ -13,6 +13,7 @@
         android:singleLine="true"
         android:hint="搜索国内城市："
         android:background="@drawable/farg_1"/>
+
     <ImageView
         android:id="@+id/search_iv_submit"
         android:layout_width="wrap_content"
@@ -20,6 +21,7 @@
         android:layout_alignParentRight="true"
         android:layout_marginLeft="5dp"
         android:src="@mipmap/icon_search"/>
+
 
 
     <TextView
